@@ -26,13 +26,13 @@ HScrollbar hs4;
 
 // List of target lattices
 ArrayList<Lattice> ccs; 
-
 ArrayList<Cost>    ccsIn;
 
 ArrayList<PVector> targets;
 ArrayList<HealthZone> healthZones;
 
 ArrayList<Agent> population;
+ArrayList<Agent> exposedPop;
 ArrayList<MultiTargetFinder> cars; 
 ArrayList<Agent> survivor;
 ArrayList<Agent> popRecord;
@@ -57,36 +57,38 @@ boolean adjust2    = false;
 boolean viz        = false;
 
 //mangina
-//float initPop                 =  0;
-//int   populationHome5         =  1;   
-//float birthProb5              =  0.0005;
-//int   populationHome4         =  4;   
-//float birthProb4              =  0.0005;
-//int   populationHome3         =  3;   
-//float birthProb3              =  0.007;
-//int   populationHome2         =  2;   
-//float birthProb2              =  0.007;
-
-//north kivu region
 float initPop                 =  0;
 int   populationHome5         =  1;   
-float birthProb5              =  0.0025;
+float birthProb5              =  0.0075;
 int   populationHome4         =  4;   
-float birthProb4              =  0.20;
+float birthProb4              =  0.4;
 int   populationHome3         =  3;   
-float birthProb3              =  0.025;
+float birthProb3              =  0.2;
 int   populationHome2         =  2;   
-float birthProb2              =  0.0075;
+float birthProb2              =  0.05;
 
+//massive pop
 //float initPop                 =  0;
 //int   populationHome5         =  1;   
-//float birthProb5              =  0.00075;
+//float birthProb5              =  0.039;
 //int   populationHome4         =  4;   
-//float birthProb4              =  0.006;
+//float birthProb4              =  0.95;
 //int   populationHome3         =  3;   
-//float birthProb3              =  0.0015;
+//float birthProb3              =  0.4;
 //int   populationHome2         =  2;   
-//float birthProb2              =  0.001;
+//float birthProb2              =  0.130;
+
+//max
+//float initPop                 =  0;
+//int   populationHome5         =  1;   
+//float birthProb5              =  1;
+//int   populationHome4         =  4;   
+//float birthProb4              =  1;
+//int   populationHome3         =  3;   
+//float birthProb3              =  1;
+//int   populationHome2         =  2;   
+//float birthProb2              =  1;
+
 
 
 //float birthProbLow                =  0.1;
@@ -97,9 +99,9 @@ int burialTime             = 0;
 int minDays                = 2;
 int maxDays                = 21;
 
-int spreadDistance         = 10;
-int deadSpreadDistance     = 18;
-float infectionProbability = 0.02; 
+int   spreadDistance       = 10;
+int   deadSpreadDistance   = 18;
+float infectionProbability = 0; 
 float deadInfectionProbability = 0;
 float healProbability      = 0;
 float healProbability2     = 0;
@@ -134,7 +136,6 @@ color currentColor;
 boolean rectOver = false;
 boolean info = true;
 
-
 int yTitle     = 959;
 int xStat      = 1335;
 int xStat2     = 1435;
@@ -149,48 +150,38 @@ int y4         = 1060;
 
 int xbar       = 1685;
 
-
 boolean zone4 = false;
+
+import peasy.*;
+import peasy.org.apache.commons.math.*;
+import peasy.org.apache.commons.math.geometry.*;
+
+PeasyCam cam;
+
 //===========================================================//  setup
 
 void setup()
 {
   size(1920, 1080);
   //fullScreen();
+  //cam = new PeasyCam(this, 100);
+  //cam.setMinimumDistance(50);
+  //cam.setMaximumDistance(500);
   //background(0);
   frameRate(12);
 
   deColors = new DEswatch ();
-  //DE = new ASCgrid ("DATA/newpopzoom3.asc");
   DE = new ASCgrid ("DATA/newpop5.asc");
-  //DE = new ASCgrid ("DATA/pop8.asc");
-  //DE = new ASCgrid ("DATA/mpop1.asc");
-  //DE = new ASCgrid ("DATA/bp4.asc");
-  //DE = new ASCgrid ("DATA/epicpop2.asc");
-  //DE = new ASCgrid ("DATA/newregionpop.asc");
   DE.fitToScreen();
   DE.updateImage(deColors.getSwatch());
 
   DElat = new Lattice(DE.w, DE.h);
   fillLattice( DElat, DE );
 
-  //topo  = loadImage( "DATA/newbackzoom.png" );
   topo  = loadImage( "DATA/newback.png" );
-  //topo  = loadImage( "DATA/back3.png" );
-  //topo  = loadImage( "DATA/mbback2.png" );
-  //topo  = loadImage( "DATA/bikoroback2.png" );
-  //topo  = loadImage( "DATA/epicback3.png" );
-  //topo  = loadImage( "DATA/newregionback3.png" );
-  //topo2  = loadImage( "DATA/newregionback_nolabels.png" );
   topo2  = loadImage( "DATA/newback_nolabel.png" );
 
-  //roadASC = new ASCgrid("DATA/newroadzoom.asc");
   roadASC = new ASCgrid("DATA/newroad.asc");
-  //roadASC = new ASCgrid("DATA/road1.asc");
-  //roadASC = new ASCgrid("DATA/mroad2.asc");
-  //roadASC = new ASCgrid("DATA/br8.asc");
-  //roadASC = new ASCgrid("DATA/epicroad6.asc");
-  //roadASC = new ASCgrid("DATA/newregion6.asc");
   roadASC.fitToScreen2();
 
   hs1 = new HScrollbar(xbar, 845, 200, 11, 14);
@@ -201,21 +192,13 @@ void setup()
   targets =   new ArrayList<PVector>();
   popRecord = new ArrayList<Agent>();
   ccs =       new ArrayList<Lattice>();
-  ccsIn =     new ArrayList<Cost>();
-
-  for ( PVector t : targets )
-  {        
-    cst = new Cost( roadASC, ROADVALUE ); 
-    cst.moreOptimal = false;
-    Lattice l = cst.getCostSurface( t );    
-    ccs.add( l ); 
-    cst.targetLocation = t;
-    ccsIn.add(cst);
-  }                         
+  ccsIn =     new ArrayList<Cost>();                       
 
   // seeking agent
   cars = new ArrayList<MultiTargetFinder>();
+  exposedPop = new ArrayList<Agent>();
   createPopulation();
+  
 
   healthZones = new ArrayList<HealthZone>();
 
@@ -233,7 +216,8 @@ void setup()
 //===========================================================// DRAW LOOP
 
 void draw()
-{    
+{ 
+  clear();
   background(0);
 
   visualization();
@@ -268,7 +252,7 @@ void simulation()
   //fill(0);
   //rect(0,0,width,951);
   ////tint(255, 210);
-
+  
   if (imageFlip == false && imageFlip2 == false) {
     image(roadASC.getImage(), 0, 0);
   } else if (imageFlip == true && imageFlip2 == false) {
@@ -280,20 +264,20 @@ void simulation()
   scrollBar();
   //drawTargets();
 
-  // 3/11/18 change
-  //ccsIn = new ArrayList<Cost>();
-  //for ( PVector t : targets )
-  //{        
-  //  cst = new Cost( roadASC, ROADVALUE ); 
-  //  cst.moreOptimal = false;
-  //  cst.targetLocation = t;
-  //  ccsIn.add(cst);
-  //}    
+  //3/11/18 change
+  ccsIn = new ArrayList<Cost>();
+  for ( PVector t : targets )
+  {        
+    cst = new Cost( roadASC, ROADVALUE ); 
+    //cst.moreOptimal = true;
+    cst.targetLocation = t;
+    ccsIn.add(cst);
+  }    
 
   for ( HealthZone h : healthZones)
   {
     h.drawCenter();
-  }
+  } 
 
   for ( Agent a : population )
   {
@@ -315,6 +299,17 @@ void simulation()
       p.drawAgent(); 
       p.update(healthZones, slope);
     }
+  }
+  
+  for (Agent p : exposedPop) {
+      float slope = 0.1;
+      p.drawAgent(); 
+      p.update(healthZones, slope);
+      
+      //if(p.seek){
+      //  removeSick();
+      //  newPathFinder(p.loc.x,p.loc.y);
+      //}
   }
 
   for ( MultiTargetFinder c : cars ) {
@@ -390,11 +385,13 @@ void visualization() {
     }
   }
 
-  //for (Agent person : popRecord) {
-  //  if ( person.returned == true) { 
-  //    numHealed += 1;
-  //  }
-  //}
+  for (Agent person : exposedPop) {
+    if (person.exposed) { 
+      numInfected += 1;
+    } else if (person.sick) { 
+      numSick += 1;
+    }
+  }
 
   //for (Agent person : population) {
   //  if ( person.noSeek == true) { 
@@ -421,8 +418,8 @@ void visualization() {
   seekLine = pub;
 
   sickHistory.add(yCord-(numSick*5));
-  survivorHistory.add(yCord-((numHealed+totalDeaths))*2.5);
-  deathHistory.add(yCord-(totalDeaths)*2.5);
+  survivorHistory.add(yCord-((numHealed+totalDeaths)));
+  deathHistory.add(yCord-(totalDeaths));
   seekHistory.add(seekLine); 
 
   //fill(255);
@@ -500,7 +497,7 @@ void visualization() {
     strokeWeight(1);
 
     stroke(200);
-    line(67*8, yCord2-0, 67*8, yCord2-120); 
+    line(67*6, yCord2-0, 67*6, yCord2-120); 
 
     stroke(70, 70, 70); 
     //if (!adjust && !adjust2) {
@@ -813,12 +810,11 @@ void keyPressed()
     // to the mouse location
 
     PVector  tt = new PVector( mouseX, mouseY );      // create a target PVector
-    cst = new Cost( roadASC, ROADVALUE );     // init the Cost function
-    cst.moreOptimal = false;                  // right now, less optimal paths
-
-    Lattice l = cst.getCostSurface( tt );           // get the cost surface lattice for new target
-    ccs.add( l  );                                   // add the lattice to the rest of the cost surfaces
-    targets.add( tt );      // add the new target to the target list
+    cst = new Cost( roadASC, ROADVALUE );             // init the Cost function
+    cst.moreOptimal = true ;                           // right now, less optimal paths
+    Lattice l = cst.getCostSurface( tt );             // get the cost surface lattice for new target
+    ccs.add( l  );                                    // add the lattice to the rest of the cost surfaces
+    targets.add( tt );                                // add the new target to the target list
 
     // Health Zone
 
@@ -915,7 +911,7 @@ void keyPressed()
 
   if ( key == 's') // sick agent
   {
-    sickAgent(mouseX, mouseY);
+    newExposed(mouseX, mouseY);
   }
 
   if ( key == 'c') // sick agent
@@ -928,78 +924,51 @@ void keyPressed()
 
 void infect()
 {
+  
+    ////--------------------------------------------------------------// person to person
 
-  //--------------------------------------------------------------// person to person
+  for ( int i = 0; i < exposedPop.size(); i += 1) {
 
-  for ( int i = 0; i < population.size(); i += 1) {
-
-    Agent person1 = population.get(i);
+    Agent exposedAgent = exposedPop.get(i);
 
     for ( int j = i + 1; j < population.size(); j += 1) 
     {
       Agent person2 = population.get(j);
 
-      float distance = dist( person1.loc.x, person1.loc.y, person2.loc.x, person2.loc.y);
+      float distance = dist( exposedAgent.loc.x, exposedAgent.loc.y, person2.loc.x, person2.loc.y);
 
       float xVacValue = hs4.getPos();
       float vacPercent = map(xVacValue, xbar+95, xbar + 305, 0, 100); 
 
-      //vacProbability = infectionProbability - vacPercent;
-
-      //if (vacPercent < 20) {
-      //  infectionProbability = 0.0225;
-      //} else if (vacPercent >= 20 && vacPercent < 40) {  
-      //  infectionProbability = 0.0175;
-      //} else if (vacPercent >= 40 && vacPercent < 60) {  
-      //  infectionProbability = 0.0125;
-      //} else if (vacPercent >= 60 && vacPercent < 80) {  
-      //  infectionProbability = 0.0075;
-      //} else if (vacPercent >= 80) {  
-      //  infectionProbability = 0.0005;
-      //}
-
       if (vacPercent < 20) {
         infectionProbability = 0.0225;
       } else if (vacPercent >= 20 && vacPercent < 40) {  
-        infectionProbability = 0.0175;
+        infectionProbability = 0.002;
       } else if (vacPercent >= 40 && vacPercent < 60) {  
-        infectionProbability = 0.0125;
-      } else if (vacPercent >= 60 && vacPercent < 80) {  
-        infectionProbability = 0.0075;
-      } else if (vacPercent >= 80) {  
         infectionProbability = 0.0005;
+      } else if (vacPercent >= 60 && vacPercent < 80) {  
+        infectionProbability = 0.0002;
+      } else if (vacPercent >= 80) {  
+        infectionProbability = 0.00005;
       }
 
       // first condition
-      if ( distance <= spreadDistance && person1.sick && !person2.sick)
+      if ( distance <= spreadDistance && exposedAgent.sick && !person2.sick)
       {
         //person 1 makes person 2 sick
         if (prob(infectionProbability) == true) {
-          person2.getInfected();
-        }
-      } else if ( distance <= spreadDistance && person2.sick && !person1.sick)
-      {
-        //person2 makes person1 sick
-        if ( prob(infectionProbability) == true) {
-          person1.getInfected();
+           person2.getExposed();
         }
       }
 
-      if (person1.seek) {
-        removeSick();
-        newPathFinder(person1.loc.x, person1.loc.y);
-      }
-
-      if (person2.seek) {
-        removeSick();
-        newPathFinder(person2.loc.x, person2.loc.y);
-      }
+      //if (person2.exposed) {
+      //  removeExposed();
+      //  newExposed(person2.loc.x, person2.loc.y);
+      //}
     }
   }
 
-
-
-  //--------------------------------------------------------------// person to person
+  ////--------------------------------------------------------------// person to person
   for ( int i = 0; i < popRecord.size(); i += 1) {
 
     Agent deadPerson = popRecord.get(i);
@@ -1011,22 +980,18 @@ void infect()
       float distance = dist( deadPerson.loc.x, deadPerson.loc.y, person2.loc.x, person2.loc.y);
 
       float xValue3 = hs2.getPos();
-      float pubAware = map(xValue3, xbar+95, xbar + 305, 0, .015); 
+      float pubAware = map(xValue3, xbar+95, xbar + 305, 0, .005); 
 
-      deadInfectionProbability = .015-pubAware;
+      deadInfectionProbability = .005-pubAware;
 
       // first condition
       if ( distance <= deadSpreadDistance && deadPerson.deceased && !person2.sick)
       {
         //person 1 makes person 2 sick
-        if (prob(deadInfectionProbability) == true && deadPerson.infectiousBody == true ) {
-          person2.getInfected();
+        if (prob(deadInfectionProbability) == true && deadPerson.infectiousBody) {
+          person2.getExposed();
         }
       } 
-      if (person2.seek) {
-        removeSick();
-        newPathFinder(person2.loc.x, person2.loc.y);
-      }
     }
   }
 
@@ -1034,7 +999,7 @@ void infect()
   //--------------------------------------------------------------// car to person
   for ( int i = 0; i < cars.size(); i += 1) {
 
-    MultiTargetFinder car1 =cars.get(i);
+    MultiTargetFinder car1 = cars.get(i);
 
     for ( int j = 0; j < population.size(); j += 1) 
     {
@@ -1046,7 +1011,7 @@ void infect()
       if (car1.atTarget) {
         infectionProbability = 0.0001;
       } else {  
-        infectionProbability = 0.0175;
+        infectionProbability = 0.0010;
       }
 
       // first condition
@@ -1054,24 +1019,38 @@ void infect()
       {
         //car makes person sick
         if (prob(infectionProbability) == true) {
-          person.getInfected();
+          person.getExposed();
         }
       } 
-
-      //remove + insert seeking car
-      if (person.seek) {
-        removeSick();
-        newPathFinder(person.loc.x, person.loc.y);
-      }
-      //
-      if (person.noSeek) {
-        //removeSick();
-        //newPathFinder(person.loc.x, person.loc.y);  
-        //numNoSeek += 1;
-      }
+      
+      //if (person.exposed) {
+      //  removeExposed();
+      //  newExposed(person.loc.x, person.loc.y);
+      //}
     }
   }
+  
+  for ( int j = 0; j < population.size(); j += 1) 
+    {
+      Agent person = population.get(j);
+      if (person.exposed) {
+        removeExposed();
+        newExposed(person.loc.x, person.loc.y);
+      }
+    }
+  
+  
+ for ( int i = 0; i < exposedPop.size(); i += 1) {
+    Agent exposedAgent = exposedPop.get(i);
+     if (exposedAgent.seek){
+        removeSick();
+        newPathFinder(exposedAgent.loc.x, exposedAgent.loc.y);
+     }
+
+  }
 }
+
+
 
 //===============================================================================//  probability function
 
@@ -1123,6 +1102,15 @@ void sickAgent(float x, float y) {
   Agent infectedPerson = new Agent( x, y);
   population.add(infectedPerson); 
   infectedPerson.getInfected();
+}
+
+void newExposed(float x, float y) {
+  Agent exposedAgent = new Agent(x, y);
+  exposedAgent.loc.x = x;
+  exposedAgent.loc.y = y;
+  exposedPop.add(exposedAgent);
+  exposedAgent.getExposed();
+  println(exposedPop.size());
 }
 
 //--------------------------------------------------------------// survivor agent
@@ -1370,7 +1358,7 @@ void vizWindow() {
   // verticle text
   for ( int p = 25; p <= 900; p += 25) {
     textAlign(LEFT);
-    text(p/2.5, 1890, yCord-p+5);
+    text(p, 1890, yCord-p+5);
   }
 
   //for ( int p = 25; p <= 290; p += 25) {
@@ -1448,30 +1436,61 @@ void vizWindow() {
     //text("82 Total Deaths [67% CFR]", 67*12+5, yCord-(82*2.5)+5);
 
     //Mangina//
-    strokeWeight(1);
+    strokeWeight(2);
     stroke(120, 120, 120);
-    line(0, yCord-(21*0), 67*8, yCord-(36*2.5));
-    line(67*8, yCord-(36*2.5), 67*9, yCord-(48*2.5));
-    line(67*9, yCord-(48*2.5), 67*10, yCord-(91*2.5));
-    line(67*10, yCord-(91*2.5), 67*11, yCord-(94*2.5));
-    line(67*11, yCord-(94*2.5), 67*12, yCord-(96*2.5));
+    line(0, yCord-(21*0), 67*6, yCord-(43));
+    line(67*6, yCord-(43), 67*7, yCord-(49));
+    line(67*7, yCord-(49), 67*8, yCord-(90));
+    line(67*8, yCord-(90), 67*9, yCord-(107));
+    line(67*9, yCord-(107), 67*10, yCord-(120));
+    line(67*10, yCord-(120), 67*11, yCord-(129));
+    line(67*11, yCord-(129), 67*12, yCord-(140));
+    line(67*12, yCord-(140), 67*13, yCord-(147));
+    line(67*13, yCord-(147), 67*14, yCord-(155));
+    line(67*14, yCord-(155), 67*15, yCord-(167));
+    line(67*15, yCord-(167), 67*16, yCord-(205));
+    line(67*16, yCord-(205), 67*17, yCord-(227));
+    line(67*17, yCord-(227), 67*18, yCord-(257));
+    line(67*18, yCord-(257), 67*19, yCord-(287));
+    line(67*19, yCord-(287), 67*20, yCord-(319));
+    line(67*20, yCord-(319), 67*21, yCord-(352));
+    line(67*21, yCord-(352), 67*22, yCord-(399));
+    line(67*22, yCord-(399), 67*23, yCord-(428));
+    line(67*23, yCord-(428), 67*24, yCord-(477));
+    line(67*24, yCord-(477), 67*25, yCord-(529));
+    line(67*25, yCord-(529), 67*26, yCord-(567));
+    line(67*26, yCord-(567), 67*27, yCord-(593));
+    line(67*27, yCord-(593), 67*28, yCord-(614));
 
-    fill(120, 120, 120);
-    textSize(15);
-    text("96 Total Cases", 67*12+5, yCord-(96*2.5)+5);
-
-
+    //reported deaths
     stroke(156, 130, 181);
-    line(0, yCord-(17*0), 67*8, yCord-(30*2.5));
-    line(67*8, yCord-(30*2.5), 67*9, yCord-(35*2.5));
-    line(67*9, yCord-(35*2.5), 67*10, yCord-(51*2.5));
-    line(67*10, yCord-(51*2.5), 67*11, yCord-(63*2.5));
-    line(67*11, yCord-(63*2.5), 67*12, yCord-(65*2.5));
+    line(0, yCord-(21*0), 67*6, yCord-(33));
+    line(67*6, yCord-(33), 67*7, yCord-(38));
+    line(67*7, yCord-(38), 67*8, yCord-(49));
+    line(67*8, yCord-(49), 67*9, yCord-(70));
+    line(67*9, yCord-(70), 67*10, yCord-(78));
+    line(67*10, yCord-(78), 67*11, yCord-(89));
+    line(67*11, yCord-(89), 67*12, yCord-(94));
+    line(67*12, yCord-(94), 67*13, yCord-(99));
+    line(67*13, yCord-(99), 67*14, yCord-(102));
+    line(67*14, yCord-(102), 67*15, yCord-(106));
+    line(67*15, yCord-(106), 67*16, yCord-(130));
+    line(67*16, yCord-(130), 67*17, yCord-(147));
+    line(67*17, yCord-(147), 67*18, yCord-(164));
+    line(67*18, yCord-(164), 67*19, yCord-(181));
+    line(67*19, yCord-(181), 67*20, yCord-(198));
+    line(67*20, yCord-(198), 67*21, yCord-(210));
+    line(67*21, yCord-(210), 67*22, yCord-(228));
+    line(67*22, yCord-(228), 67*23, yCord-(248));
+    line(67*23, yCord-(248), 67*24, yCord-(275));
+    line(67*24, yCord-(275), 67*25, yCord-(311));
+    line(67*25, yCord-(311), 67*26, yCord-(347));
+    line(67*26, yCord-(347), 67*27, yCord-(360));
+    line(67*27, yCord-(360), 67*28, yCord-(374));
+    
     fill(156, 130, 181);
-    text("65 Total Deaths [67% CFR]", 67*12+5, yCord-(65*2.5)+5);
-
     stroke(200);
-    line(67*8, yCord, 67*8, yCord-950); 
+    line(67*6, yCord, 67*6, yCord-950); 
 
     xCord2 = xCord2 + 0.6;
   }

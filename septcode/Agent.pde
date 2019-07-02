@@ -25,6 +25,7 @@ class Agent {
   int         speed = 15;       
 
   /////////////////////////////////////////// merge variables
+  boolean exposed   = false;
   boolean dead      = false;
   boolean sick      = false;
   boolean healed    = false;
@@ -107,9 +108,8 @@ class Agent {
         }
       }
     }//end for()
-
+    
     foundRoad = true;
-
     loc = new PVector( argMinX, argMinY);
     k.setNeighborhoodDistance(speed);
   };
@@ -217,10 +217,9 @@ class Agent {
       updateVelocityDirection();
     }
 
-    if (infected)
+    if (exposed)
     { 
       t += 1;
-     
       if (t >= incubationPeriod) {    
         getSick(minDays, maxDays);
       }
@@ -348,17 +347,31 @@ class Agent {
     if (healed == false) {
       healthy = false;  
       infected = true;
+      exposed = false;
+      //t = 0;
+    }
+  }
+  
+    void getExposed()
+  {
+    if (healed == false) {
+      healthy  = false;  
+      exposed  = true;
+      infected = false;
+      sick     = false;
       t = 0;
     }
   }
 
   void getSick(int minDay, int maxDay)
   {
-    sick = true;
+    sick     = true;
     infected = false;
-    healthy = false;  
+    exposed  = false;
+    healthy  = false;  
     days = (int)random(minDay, maxDay);
   }
+
 
   void getHealed()
   {
@@ -440,6 +453,12 @@ class Agent {
       rad = 3;
       speed = 5;
     } 
+    
+    if (exposed) {
+      fill(255);
+      rad = 3;
+      speed = 5;
+    } 
 
     if (healed) {
       fill(255); 
@@ -457,38 +476,38 @@ class Agent {
     }
 
     if (healthy) {
-      fill(255,90); 
+      fill(255,45); 
       rad = 2;
     }
     
     //agents by pop density
-    if(LUhome == 1){
-      rad = 4;
-      fill(255,0,0);
-      speed = 1;
-    }
+    //if(LUhome == 1){
+    //  rad = 2;
+    //  fill(255,0,0);
+    //  speed = 1;
+    //}
     
-    if(LUhome == 2){
-      rad = 2;
-      fill(0,0,255);
-    }
+    //if(LUhome == 2){
+    //  rad = 2;
+    //  fill(0,0,255);
+    //}
     
-    if(LUhome == 3){
-      rad = 2;
-      fill(0,255,0);
-      speed = 20;
-    }
+    //if(LUhome == 3){
+    //  rad = 2;
+    //  fill(0,255,0);
+    //  speed = 20;
+    //}
     
-    if(LUhome == 4){
-      rad = 2;
-      fill(255,0,255);
-    }
+    //if(LUhome == 4){
+    //  rad = 2;
+    //  fill(255,0,255);
+    //}
 
     noStroke();
     ellipseMode( CENTER );
     ellipse( loc.x+offset, loc.y+offset, rad, rad );
 
-    strokeWeight(2);
+    strokeWeight(2); 
     if ( sick ) {
       noFill();
       stroke(255, 48, 36,170);
@@ -524,11 +543,17 @@ class Agent {
       
     }
     
-    if(infected) {
+    //if(infected) {
+    //  noFill();
+    //  stroke(254, 184, 1,170);
+    //  ellipse(loc.x+offset, loc.y+offset, 10, 10);
+    //}
+    if(exposed) {
       noFill();
       stroke(254, 184, 1,170);
       ellipse(loc.x+offset, loc.y+offset, 10, 10);
     }
+    
   }
 
   float calcRadians( PVector target )
@@ -559,7 +584,7 @@ class Agent {
 
 void removeSick()
 {
-  Iterator iter = population.iterator();
+  Iterator iter = exposedPop.iterator();
   Agent tempAgent;
 
   while ( iter.hasNext() )
@@ -570,7 +595,7 @@ void removeSick()
       //numNoSeek += 1;
     }
     
-    if ( tempAgent.sick == true && tempAgent.seek == true)
+    if ( tempAgent.sick && tempAgent.seek )
     {
       iter.remove();
      // numSeek += 1;
@@ -581,7 +606,7 @@ void removeSick()
 
 void removeDead()
 {
-  Iterator iter = population.iterator();
+  Iterator iter = exposedPop.iterator();
   Agent tempAgent;
 
   while ( iter.hasNext() )
@@ -609,6 +634,25 @@ void removeDeceased()
     tempAgent = (Agent)iter.next();
     if ( tempAgent.deceased == true && !tempAgent.infectiousBody)
     {
+      iter.remove();
+    }
+  }
+}
+
+void removeExposed()
+{
+  Iterator iter = population.iterator();
+  Agent tempAgent;
+
+  while ( iter.hasNext() )
+  {    
+    tempAgent = (Agent)iter.next();
+    if ( tempAgent.exposed == true)
+    {
+      stroke(254, 184, 1,170);
+      strokeWeight(2);
+      noFill();
+      ellipse(tempAgent.loc.x, tempAgent.loc.y, 28, 28);
       iter.remove();
     }
   }

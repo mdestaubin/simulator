@@ -6,9 +6,9 @@ class Kernel
 ////////////////////////////////////////////////////////////////
     private  int ringSize     = 1;
     public   boolean torus    = false;
-    public   int kernelType   = 1;  // 1 - Moore, 2 - von Neumann
+    public   int kernelType   = 12;  // 1 - Moore, 2 - von Neumann
   
-    private int hoodSize     = 8; // size of neighborhood (moore = 8, Neumann = 4)
+    private int hoodSize     = 4; // size of neighborhood (moore = 8, Neumann = 4)
     private float NaN        = -9999;
 
 ////////////////////////////////////////////////////////////////
