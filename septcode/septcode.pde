@@ -67,32 +67,6 @@ float birthProb3              =  0.2;
 int   populationHome2         =  2;   
 float birthProb2              =  0.05;
 
-//massive pop
-//float initPop                 =  0;
-//int   populationHome5         =  1;   
-//float birthProb5              =  0.039;
-//int   populationHome4         =  4;   
-//float birthProb4              =  0.95;
-//int   populationHome3         =  3;   
-//float birthProb3              =  0.4;
-//int   populationHome2         =  2;   
-//float birthProb2              =  0.130;
-
-//max
-//float initPop                 =  0;
-//int   populationHome5         =  1;   
-//float birthProb5              =  1;
-//int   populationHome4         =  4;   
-//float birthProb4              =  1;
-//int   populationHome3         =  3;   
-//float birthProb3              =  1;
-//int   populationHome2         =  2;   
-//float birthProb2              =  1;
-
-
-
-//float birthProbLow                =  0.1;
-
 int dayCounter             = 0;
 int framesPerDay           = 16;
 int burialTime             = 0;
@@ -105,7 +79,6 @@ float infectionProbability = 0;
 float deadInfectionProbability = 0;
 float healProbability      = 0;
 float healProbability2     = 0;
-
 
 int currentPopulationSize  = 0;
 int currentHealed          = 0;
@@ -163,11 +136,6 @@ PeasyCam cam;
 void setup()
 {
   size(1920, 1080);
-  //fullScreen();
-  //cam = new PeasyCam(this, 100);
-  //cam.setMinimumDistance(50);
-  //cam.setMaximumDistance(500);
-  //background(0);
   frameRate(12);
 
   deColors = new DEswatch ();
@@ -199,7 +167,6 @@ void setup()
   exposedPop = new ArrayList<Agent>();
   createPopulation();
   
-
   healthZones = new ArrayList<HealthZone>();
 
   sickHistory =     new ArrayList<Float>();
@@ -221,13 +188,8 @@ void draw()
   background(0);
 
   visualization();
-  //dataViz();
   dataRecord();
   simulation();
-  //fill(0);
-  //noStroke();
-  //rectMode(CORNER);
-  //rect(0, yCord2-127, 6, -15);
   record();
 
   if (viz) {
@@ -235,24 +197,13 @@ void draw()
   }
 
   if (frameCount%24 == 0) {
-    //println("pop = " x+population.size());
-    //println("cars = " +cars.size());
-    //println("survivor = " +survivor.size());
-    //println("poprecord = " +popRecord.size());
-    //println("healthzones = " + healthZones.size());
-    //println("targets = " + targets.size());
   }
 };
 
 //===========================================================// SIMULATION
 
 void simulation()
-{  
-  //noStroke();
-  //fill(0);
-  //rect(0,0,width,951);
-  ////tint(255, 210);
-  
+{ 
   if (imageFlip == false && imageFlip2 == false) {
     image(roadASC.getImage(), 0, 0);
   } else if (imageFlip == true && imageFlip2 == false) {
@@ -337,21 +288,14 @@ void simulation()
 
 void visualization() {
 
-  //rectMode(CORNER);
-  //noStroke();
-  //fill(0);
-  //rect(0, 930, width, 100);
+
 
   float popSize = population.size() + totalDeaths;
   float numSick = 0;
   float numInfected = 0;
-  // float numHealed = 0;
   float numHealthy = 0;
   float numExZone   = 0;
   float numTempZone = 0;
-  //float numIsolationHeal = 0;
-  //float numHospHeal = 0;
-  //float numHospNoHeal = 0;
   float numNoSeekNoHeal = 0;
 
   for ( HealthZone h : healthZones) {
@@ -393,23 +337,6 @@ void visualization() {
     }
   }
 
-  //for (Agent person : population) {
-  //  if ( person.noSeek == true) { 
-  //    numNoSeek += 1;
-  //  }
-  //}
-
-  //for (MultiTargetFinder person : cars) {
-  //  if (  person.seekHeal == true) { 
-  //    numHospHeal += 1;
-  //  }
-  //}
-
-  //for (MultiTargetFinder person : cars) {
-  //  if (  person.seekNoHeal == true) { 
-  //    numHospNoHeal += 1;
-  //  }
-  //}
   //------------------------------------------------------------// bottom data bar  
 
   float xValue3 = hs3.getPos();
@@ -422,8 +349,6 @@ void visualization() {
   deathHistory.add(yCord-(totalDeaths));
   seekHistory.add(seekLine); 
 
-  //fill(255);
-  //rect(0,yCord2-120,15,-15);
 
   strokeWeight(1);
   fill(150);
@@ -500,40 +425,6 @@ void visualization() {
     line(67*6, yCord2-0, 67*6, yCord2-120); 
 
     stroke(70, 70, 70); 
-    //if (!adjust && !adjust2) {
-    //line(0, yCord2-0, 67*6, yCord2 - 40/2);  
-    //line(67*6, yCord2 - 40/2, 67*7, yCord2 - 104/2);
-    //line(67*7, yCord2 - 104/2, 67*8, yCord2 - 56/2);
-    //line(67*8, yCord2 - 56/2, 67*9, yCord2 - 80/2);
-    //line(67*9, yCord2 - 80/2, 67*10, yCord2 - 24/2);
-    //line(67*10, yCord2 - 24/2, 67*11, yCord2 - 16/2);
-    //line(67*11, yCord2 - 16/2, 67*12, yCord2);
-    //line(67*12, yCord2, 67*13, yCord2-56/2);
-    //line(67*13, yCord2-56/2, 67*14, yCord2);
-    //line(67*14, yCord2, 67*19, yCord2);
-    //}
-
-    //else if(adjust && !adjust2){
-    //line(0,yCord2 - 40/2, 67, yCord2 - 104/2);
-    //line(67,yCord2 - 104/2, 67*2, yCord2 - 56/2);
-    //line(67*2, yCord2 - 56/2, 67*3, yCord2 - 80/2);
-    //line(67*3, yCord2 - 80/2, 67*4, yCord2 - 24/2);
-    //line(67*4, yCord2 - 24/2, 67*5, yCord2 - 16/2);
-    //line(67*5, yCord2 - 16/2, 67*6, yCord2);
-    //line(67*6, yCord2, 67*7, yCord2-56/2);
-    //line(67*7, yCord2-56/2, 67*8, yCord2);
-    //line(67*8, yCord2, 67*19, yCord2);
-    //} else if (adjust2 && !adjust) {
-    //line(0, yCord2 - 40/4, 67, yCord2 - 104/4);
-    //line(67, yCord2 - 104/4, 67*2, yCord2 - 56/4);
-    //line(67*2, yCord2 - 56/4, 67*3, yCord2 - 80/4);
-    //line(67*3, yCord2 - 80/4, 67*4, yCord2 - 24/4);
-    //line(67*4, yCord2 - 24/4, 67*5, yCord2 - 16/4);
-    //line(67*5, yCord2 - 16/4, 67*6, yCord2);
-    //line(67*6, yCord2, 67*7, yCord2-56/4);
-    //line(67*7, yCord2-56/4, 67*8, yCord2);
-    //line(67*8, yCord2, 67*19, yCord2);
-    //}
 
     xCord = xCord + 0.6;
   }
@@ -565,6 +456,8 @@ void visualization() {
   //float percentHospHeal = 100-caseFatalityRate;
   float percentIsolationHeal = numIsolationHeal/(numIsolationHeal+numNoSeekNoHeal);
   float percentHospHeal = numHospHeal/(numHospHeal+numHospNoHeal);
+  
+  
 
 
   noStroke();
@@ -647,14 +540,7 @@ void visualization() {
   ellipse(xStat-12, y4-5, 3, 3);
 
 
-  //if (numSick == 0 && numInfected == 0 && dayCounter > 200) {
-  //  if (looping) {
-  //    recording = !recording;
-  //    noLoop();
-  //  } else {
-  //    loop();
-  //  }
-  //}
+  
 }
 //--------------------------------------------------------------//
 
@@ -714,7 +600,7 @@ void scrollBar() {
   //rect(55, hs2.ypos, hs2.spos-55, 10);
 
   textSize(9);
-  textAlign(LEFT);
+  textAlign();
   fill(255);
   text("% " + aidMoney, hs1.spos+8, hs1.ypos+9);
   text("% " + aidMoney2, hs2.spos+8, hs2.ypos+9);
@@ -741,10 +627,7 @@ void scrollBar() {
   stroke(250);
   strokeWeight(2);
   textSize(10);
-  //text("10 KM", 164, 911);
-  //line(25, 910, 158, 910);
-  //line(25, 910, 25, 905);
-  //line(158, 910, 158, 905);
+
   textSize(13);
 }
 
@@ -760,24 +643,30 @@ void createPopulation() // Create Population
     for ( int y = 0; y < DElat.h; y += 1 ) {
 
       int val =  (int) DElat.get(x, y);
-
-      if (val == populationHome2 && random(1.0) <= birthProb2) {
-        Agent temp = new Agent(x, y);
-        temp.setHomeClass(populationHome2);
-        addToPopulation(temp);
-      } else if (val == populationHome3 && random(1.0) <= birthProb3) {
-        Agent temp = new Agent(x, y);
-        temp.setHomeClass(populationHome3);
-        addToPopulation(temp);
-      } else if (val == populationHome4 && random(1.0) <= birthProb4) {
-        Agent temp = new Agent(x, y);
-        temp.setHomeClass(populationHome4);
-        addToPopulation(temp);
-      } else if (val == populationHome5 && random(1.0) <= birthProb5) {
+      float randVal = random(1.0);
+// check logic
+      if (val == populationHome5 && randVal <= birthProb5) {
+        //System.out.print("a");
         Agent temp = new Agent(x, y);
         temp.setHomeClass(populationHome5);
         addToPopulation(temp);
+      } else if (val == populationHome2 && randVal <= (birthProb2+birthProb5)) {
+        //System.out.print("b");
+        Agent temp = new Agent(x, y);
+        temp.setHomeClass(populationHome2);
+        addToPopulation(temp);
+      } else if (val == populationHome3 && randVal <= (birthProb3+birthProb2+birthProb5)) {
+        //System.out.print("y");
+        Agent temp = new Agent(x, y);
+        temp.setHomeClass(populationHome3);
+        addToPopulation(temp);
+      } else if (val == populationHome4 && randVal <= (birthProb4+birthProb3+birthProb2+birthProb5)) {
+        //System.out.print("w");
+        Agent temp = new Agent(x, y);
+        temp.setHomeClass(populationHome4);
+        addToPopulation(temp);
       }
+      
     }
   }
 }
@@ -917,6 +806,9 @@ void keyPressed()
   if ( key == 'c') // sick agent
   {
     newPathFinder(mouseX, mouseY);
+  } else 
+  {
+  assert true;
   }
 }
 
@@ -1254,7 +1146,7 @@ void dataViz() {
     //stroke(156, 130, 181);
     //line(0, yCord-(17*0), 67*8, yCord-(34*2.5));
     //line(67*8, yCord-(34*2.5), 67*9, yCord-(41*2.5));
-    //line(67*9, yCord-(41*2.5), 67*10, yCord-(59*2.5));
+    //line(67*9, yCord-(41*2.5), 67*10, yCord-(59*2.5)); //<>//
     //line(67*10, yCord-(59*2.5), 67*11, yCord-(75*2.5));
     //line(67*11, yCord-(75*2.5), 67*12, yCord-(82*2.5));
     //fill(156, 130, 181);
