@@ -117,8 +117,13 @@ float numHospHeal      = 0;
 float numHospNoHeal    = 0;
 float numIsolationHeal = 0;
 float deathsPerDay     = 0;
+float vacGlobal        = 0; 
+float pubGlobal        = 0;
+float burGlobal        = 0;
+float caseGlobal       = 0;
+float cfrGlobal       = 0;
 
-float xCord  = 0;
+float xCord  = 0; //<>//
 float xCord1 = 0;
 float xCord2 = 0;
 float yCord  = 930;
@@ -181,8 +186,8 @@ void setup()
 
   topo  = loadImage( "DATA/newback.png" );
   topo2  = loadImage( "DATA/newback_nolabel.png" );
-  output = createWriter("velocity_data.csv");
-  output.println("No of Days"+","+"current Population Size"+","+"current Healed"+","+"total Deaths"+","+"num Healed"+","+"deaths Per Day");
+  output = createWriter("sim_data.csv");
+  output.println("Days"+","+"Population Size"+","+"Total Deaths"+","+"Total Cases"+","+"CFR"+","+"Vaccination"+","+"Seek Treatment"+","+"Safe Burials");
 
   roadASC = new ASCgrid("DATA/newroad.asc");
   roadASC.fitToScreen2();
@@ -344,7 +349,7 @@ void simulation()
     dayCounter += 1;
     println(dayCounter);
 
-    output.println(dayCounter+","+currentPopulationSize+","+currentHealed+","+totalDeaths+","+numHealed+","+deathsPerDay);// writing to .csv file
+    output.println(dayCounter+","+currentPopulationSize+","+totalDeaths+","+caseGlobal+","+cfrGlobal+","+vacGlobal+","+pubGlobal+","+burGlobal);// writing to .csv file
     output.flush();// Write the remaining data to .csv file
     
     /*
@@ -498,8 +503,10 @@ void visualization() {
 
   float xValue3 = hs3.getPos();
   float pub = round(map(xValue3, xbar+95, xbar + 305, 0, 100));
-
+  pubGlobal = pub;
   seekLine = pub;
+  
+  caseGlobal = numHealed+totalDeaths;
 
   sickHistory.add(yCord-(numSick*5));
   survivorHistory.add(yCord-((numHealed+totalDeaths)));
@@ -637,6 +644,7 @@ void visualization() {
 
   float numAffected = numHealed + totalDeaths + numInfected + numSick;
   float caseFatalityRate = totalDeaths/(numHealed+totalDeaths) * 100;
+  cfrGlobal = caseFatalityRate;
 
   float percentSick = numSick / popSize * 100;
   float percentInfected = numInfected / popSize * 100;
@@ -788,10 +796,12 @@ void scrollBar() {
   int    aid = round(map(xValue, xbar+95, xbar + 305, 0, 100));
   String aidMoney = nfc(aid);
   int    aid2 = round(map(xValue2, xbar+95, xbar + 305, 0, 100));
+  burGlobal = aid2;
   String aidMoney2 = nfc(aid2);
   int    pub = round(map(xValue3, xbar+95, xbar + 305, 0, 100));
   String pubAwarness = nfc(pub);
   int    vac = round(map(xValue4, xbar+95, xbar + 305, 0, 100));
+  vacGlobal = vac;
   String vacPercent = nfc(vac);
 
   fill(0, 255, 255, 120);
