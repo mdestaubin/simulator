@@ -1,4 +1,4 @@
-//  Ebola Outbreak Response Simulator 
+//  Ebola Outbreak Response Simulator  //<>//
 //  MDES Risk + Resilience Open Project
 //  Michael de St. Aubin
 
@@ -156,6 +156,10 @@ int y4         = 1060;
 
 int xbar       = 1685;
 
+//input
+BufferedReader reader;
+String line;
+
 boolean zone4 = false;
 
 import peasy.*;
@@ -163,6 +167,8 @@ import peasy.org.apache.commons.math.*;
 import peasy.org.apache.commons.math.geometry.*;
 
 PeasyCam cam;
+
+int[] data;
 
 //===========================================================//  setup
 
@@ -183,6 +189,11 @@ void setup()
 
   DElat = new Lattice(DE.w, DE.h);
   fillLattice( DElat, DE );
+  //input
+  reader = createReader("inputfile.csv"); 
+
+
+//printArray(data);
 
   topo  = loadImage( "DATA/newback.png" );
   topo2  = loadImage( "DATA/newback_nolabel.png" );
@@ -347,75 +358,28 @@ void simulation()
     removeDead();
     removeDeceased();
     dayCounter += 1;
-    println(dayCounter);
+    //println(dayCounter);
 
     output.println(dayCounter+","+currentPopulationSize+","+totalDeaths+","+caseGlobal+","+cfrGlobal+","+vacGlobal+","+pubGlobal+","+burGlobal);// writing to .csv file
     output.flush();// Write the remaining data to .csv file
-    
-    /*
-     float numAffected = numHealed + totalDeaths + numInfected + numSick;
-  float caseFatalityRate = totalDeaths/(numHealed+totalDeaths) * 100;
-
-  float percentSick = numSick / popSize * 100;
-  float percentInfected = numInfected / popSize * 100;
-  float percentHealed = numHealed / popSize * 100;
-  float percentDead = totalDeaths / popSize * 100;
-  float percentHealthy = numHealthy / popSize * 100;
-  float percentAffected = numAffected / popSize * 100;
-  float percentIncidence = numAffected / dayCounter;  
-  float popDensity = popSize / 22000 * 10;
-  //float percentHospHeal = 100-caseFatalityRate;
-  float percentIsolationHeal = numIsolationHeal/(numIsolationHeal+numNoSeekNoHeal);
-  float percentHospHeal = numHospHeal/(numHospHeal+numHospNoHeal);
-
-
-
-float numHospHeal      = 0;
-float numHospNoHeal    = 0;
-float numIsolationHeal = 0;
-
-  noStroke();
-  fill(0);
-  rect(1308, yCord, 800, 800);
-  fill(255);
-  strokeWeight(1);
-  stroke(150);
-  // line(0, yCord, width, yCord);
-  line(1308, yCord, 1308, yCord+150);
-
   
-  text( "HOSPITAL", xStat, y3);
-  text(  ":  " + nf(numExZone, 0, 0), xStat2, y3);
-
-  text( "ETU", xStat, y4);
-  text( ":  " + nf(numTempZone, 0, 0), xStat2, y4);
-
-  // text( "HEALTHY   ", xStat3, yTitle);
-  //text( nf(numHealthy, 0, 0), xStat2, yHealthy);
-
-  text( "INCUBATION  ", xStat3, y1);
-  text(  ":  " + nf(numInfected, 0, 0), xStat4, y1);
-
-  text( "SYMPTOMATIC ", xStat3, y2);
-  text(  ":  " + nf(numSick, 0, 0), xStat4, y2);
-
-  //text( "IN TREATMENT : ", xStat, yTreatment);
-  //text(  nf(numTreatment, 0, 0), xStat2, yTreatment);
-
-
-  text( "TOTAL AFFECTED", xStat5, y1  );
-  text(  ":  " + nf(numAffected, 0, 0), xStat6, y1 );
-
-  text( "PREVALANCE", xStat5, y2);
-  text(  ":  " + nf(percentAffected, 0, 3)+"%", xStat6, y2);
-
-  text( "INCIDENCE RATE", xStat5, y3);
-  text( ":  " + nf(percentIncidence, 0, 2), xStat6, y3);
-
-  text( "CASE FATALITY RATE", xStat5, y4);
-  text(  ":  " + nf(caseFatalityRate, 0, 2)+"%", xStat6, y4); 
-   */
-   
+  //input data from csv
+    try {
+    line = reader.readLine();
+  } catch (IOException e) {
+    e.printStackTrace();
+    line = null;
+  }
+  if (line == null) {
+    // Stop reading because of an error or file is empty
+    noLoop();  
+  } else {
+    //get input varibles here
+    int[] pieces = int(split(line, ','));
+    int x = int(pieces[0]);
+    int y = int(pieces[1]);
+  }
+    
    
   }
 
@@ -502,6 +466,7 @@ void visualization() {
   //------------------------------------------------------------// bottom data bar  
 
   float xValue3 = hs3.getPos();
+  //println(xValue3);
   float pub = round(map(xValue3, xbar+95, xbar + 305, 0, 100));
   pubGlobal = pub;
   seekLine = pub;
@@ -1209,7 +1174,7 @@ void newExposed(float x, float y) {
   exposedAgent.loc.y = y;
   exposedPop.add(exposedAgent);
   exposedAgent.getExposed();
-  println(exposedPop.size());
+  //println(exposedPop.size());
 }
 
 //--------------------------------------------------------------// survivor agent
@@ -1484,7 +1449,7 @@ void vizWindow() {
   stroke(200);
   strokeWeight(2);
   line(0, yCord, width, yCord);
-  //line(0, yCord-650, width, yCord-650);
+  //line(0, yCord-650, width,h yCord-650);
 
   //--------------------------------------------------------// data lines
   strokeWeight(2);
@@ -1670,5 +1635,4 @@ boolean overRect(int x, int y, int width, int height) {
     return true;
   } else {
     return false;
-  }
-}
+  }}
