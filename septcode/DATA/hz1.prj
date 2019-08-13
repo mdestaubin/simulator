@@ -1,0 +1,5 @@
+Projection    GEOGRAPHIC
+Spheroid      WGS84
+Units         DD
+Zunits        NO
+Parameters    
