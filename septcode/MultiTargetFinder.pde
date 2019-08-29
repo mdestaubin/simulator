@@ -16,49 +16,7 @@ class MultiTargetFinder extends Agent {
   };
   
 //---------------------------------------------------//
- 
-//void pickTarget( ArrayList<Cost> ccsIn )
-//  {
-//      //println("Current target: " + currentTarget);
-//      float minDist = MAX_FLOAT;
-//      int   argMin  = 0;
-//      int   rand = 0;
-      
-//      boolean isTemporarySeen = false;
-//      boolean targetIsTemporary = false;  
-
-//      if (target != null) return;
-//      else target = null; 
-
-//      for( int i = 0; i < ccsIn.size(); i++ )
-//      {
-//        rand = (int)random(0,i);  
-//        //println("rand value = " + rand);
-        
-//      for (HealthZone z : healthZones){
-//            if (isTemporarySeen && !z.isTemporary) continue;
-//            if (z.isTemporary) isTemporarySeen = true;
-      
-//          PVector targetLoc = ccsIn.get(i).targetLocation;
-//          float   thisDistance = dist( loc.x, loc.y, targetLoc.x, targetLoc.y);
-          
-//           if( thisDistance <= minDist || (!targetIsTemporary && z.isTemporary)) 
-//           {
-//              minDist = thisDistance;
-//              argMin  = i;
-//              targetIsTemporary = z.isTemporary;
-//          }
-//      }
-//  }
-
-//if( random(0,1) < 1.0 ){ 
-//  currentTarget = argMin;
-// }
-//else{
-//currentTarget = rand; 
-// }
-//}
-
+/*
 void pickTarget( ArrayList<Cost> ccsIn )
   {
       //println("Current target: " + currentTarget);
@@ -89,6 +47,51 @@ void pickTarget( ArrayList<Cost> ccsIn )
   }
   
   currentTarget = argMin; 
+  
+  } */
+
+void pickTarget( ArrayList<Cost> ccsIn )
+  {
+      //println("Current target: " + currentTarget);
+      float minDist = MAX_FLOAT;
+      int   argMin  = 0;
+      int argMinTemp = 0;
+      
+      boolean isTemporarySeen = false;
+      boolean targetIsTemporary = false;  
+      if (target != null) return;
+      else target = null;
+      
+      for( int i = 0; i < ccsIn.size(); i++ )
+      {
+        
+      for (HealthZone z : healthZones){
+           // if (isTemporarySeen && !z.isTemporary) continue;
+            if (z.isTemporary) isTemporarySeen = true;
+            
+          PVector targetLoc = ccsIn.get(i).targetLocation;
+          float   thisDistance = dist( loc.x, loc.y, targetLoc.x, targetLoc.y);
+           if( thisDistance <= minDist && z.isTemporary) 
+           {  
+             isTemporarySeen = true;
+              minDist = thisDistance;
+              argMinTemp  = i;
+              targetIsTemporary = z.isTemporary;
+          }
+          else if (thisDistance <= minDist && !z.isTemporary){
+              minDist = thisDistance;
+              argMin  = i;
+              targetIsTemporary = z.isTemporary;
+          
+          }
+       }
+  }
+  if (isTemporarySeen)
+      currentTarget = argMinTemp; 
+   else {
+      currentTarget = argMin;
+   }
+   
   
   }
  
